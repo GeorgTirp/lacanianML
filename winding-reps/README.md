@@ -83,6 +83,44 @@ consistency. Everything else is secondary or exploratory.
 **Kill criterion (§7.4):** if C matches A/D conditional stability under P2, the
 topological claim adds nothing and is reported as such, with equal prominence.
 
+## v3 — the training axis (exp3)
+
+exp2 found no daylight between structural and learned winding invariants on the
+**input axis** (fixed weights, near-manifold evaluation): when the label *is*
+the invariant, a learned approximation and a structural function are the same
+function. The conservation law, however, is about **training dynamics** — so v3
+tests axes where the two can separate: continued training and weight-space noise.
+
+**v3 claim:** structural invariants (typed phase head + permanent gate barrier)
+are protected along the training axis; a learned invariant stored in ordinary
+weights (baseline C) is not. Arms reuse exp2-quality models (all start at winding
+accuracy 1.0). A = barrier active throughout; A_nb = barrier disabled during
+fine-tuning (mechanism attribution); C = GRU with its winding head frozen for
+evaluation.
+
+- **P5 (retention under continued training):** fine-tune the shared trunk on two
+  interfering tasks (quantized mean radius, then start-point sector). A's
+  winding accuracy stays ≥ 0.99 absent gate events (any drop must coincide with
+  a gate event); C's degrades. If A_nb ≈ A, the barrier is not load-bearing
+  (typing alone protects) — reported.
+- **P6 (weight-noise plateau–cliff):** add per-layer-scaled Gaussian weight
+  noise; A holds an exact plateau far past C, and A's per-loop failures are
+  gate-mediated (failed loops sit closer to the gate); C degrades smoothly.
+- **P7 (exploratory):** protection must not cost new-task plasticity — compare
+  task learning curves.
+- **v3 kill criterion (headline prominence):** if C retains as well as A under
+  *both* continued training and weight noise, structural protection has no
+  measurable advantage on any axis tested — stated plainly.
+
+**EU fix (§3):** the exp2 disagreement peak at the origin is confounded (the four
+sector boundaries meet there). v3 relocates ĉ from a **regression** point track
+(`y = sin 2θ + 0.1ε`, no class boundaries), so the interior peak is
+coverage-driven; its only requirement is landing inside the hole (per P1b).
+
+**Scope:** v3 tests *passive* structural persistence (typing + barrier) under
+ordinary training; it does not implement any active circulation/update-rule
+change — a separate later tier.
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -114,6 +152,7 @@ pytest -q                                   # unit tests
 python experiments/exp0_sanity.py           # M1: conservation + gate reproduction
 python experiments/exp1_product_latent.py   # M2: product-latent open question
 python experiments/exp2_main.py             # M3–M5: EU map, four arms, full eval
+python experiments/exp3_retention.py        # v3: training-axis retention + weight noise
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every

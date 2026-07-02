@@ -116,6 +116,46 @@ def disagreement_map(models, cfg=CFG, kind="variance"):
     return grid, dis, axis
 
 
+def train_ensemble_regression(reg_track, cfg=CFG, seed=0):
+    """v3 EU fix: ensemble of M regressors (seeds + bootstrap) on the regression
+    point track. No class boundaries -> interior disagreement is coverage-driven.
+    """
+    from .models import PointRegressor
+    x = torch.tensor(reg_track["x"], dtype=torch.float32)
+    y = torch.tensor(reg_track["y"], dtype=torch.float32)
+    n = len(y)
+    models = []
+    for m in range(cfg.n_ensemble):
+        torch.manual_seed(seed * 100 + m)
+        boot = np.random.default_rng(seed * 100 + m).integers(0, n, size=n)
+        xb, yb = x[boot], y[boot]
+        net = PointRegressor(cfg)
+        opt = torch.optim.Adam(net.parameters(), lr=1e-2)
+        lossf = nn.MSELoss()
+        for _ in range(cfg.ens_epochs):
+            opt.zero_grad()
+            loss = lossf(net(xb), yb)
+            loss.backward()
+            opt.step()
+        models.append(net)
+    return models
+
+
+def disagreement_map_regression(models, cfg=CFG):
+    """Disagreement = variance across the ensemble of the predicted regression
+    mean, over the generative grid. Returns (grid, disagreement, axis)."""
+    lim, gn = cfg.grid_lim, cfg.grid_n
+    axis = np.linspace(-lim, lim, gn)
+    gx, gy = np.meshgrid(axis, axis)
+    grid = np.stack([gx.ravel(), gy.ravel()], axis=1)
+    emb = Embedding(cfg)
+    xg = torch.tensor(emb(grid, noise=0.0), dtype=torch.float32)
+    with torch.no_grad():
+        preds = np.stack([net(xg).numpy() for net in models])   # (M, G)
+    dis = preds.var(axis=0)                                      # (G,)
+    return grid, dis, axis
+
+
 def interior_peak(grid, dis, train_points, top_frac=0.1):
     """Estimate c_hat: disagreement-weighted centroid of the high-disagreement
     region *inside the convex hull* of the training data (isolates the interior

@@ -57,6 +57,21 @@ class Config:
     # ---- baseline C (GRU) ----
     gru_hidden: int = 40
 
+    # ---- v3: training-axis experiment (exp3) ----
+    # Additive only; none of these change exp0-exp2 behaviour.
+    ft_head_hidden: int = 32         # per-task head width (mean-pool -> MLP)
+    ft_budget: int = 800             # max fine-tune steps per interfering task
+    ft_target_acc: float = 0.95      # early-stop task accuracy
+    ft_grad_clip: float = 1.0        # grad-norm clip so the barrier stays effective
+    ft_log_every: int = 10           # fine-tune logging cadence (fine enough for gates)
+    wn_sigma_lo: float = 0.01        # weight-noise relative sigma range
+    wn_sigma_hi: float = 4.0         # extended 1.0->4.0: A's plateau exceeds the
+                                     # addendum's pre-registered 1.0 (documented,
+                                     # §7.1) so the sweep must reach A's cliff
+    wn_n_sigma: int = 13
+    wn_samples: int = 20             # noise draws per sigma
+    reg_noise: float = 0.1           # regression EU target noise (0.1*eps)
+
     # ---- evaluation ----
     eps_grid_max: float = 1.2
     eps_grid_n: int = 13

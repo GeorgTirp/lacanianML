@@ -171,3 +171,36 @@ def embed_loop(p, cfg=CFG, noise=None, rng=None):
     emb = Embedding(cfg)
     n = cfg.obs_noise if noise is None else noise
     return emb(p, noise=n, rng=rng)
+
+
+# --------------------------------------------------------------------------- #
+#  v3: interfering-task labels (same input distribution, different targets)    #
+# --------------------------------------------------------------------------- #
+def radius_class_labels(p, cfg=CFG):
+    """Task 2: quantized mean loop radius -> 3 classes.
+    bins: [1.05,1.35) -> 0, [1.35,1.65) -> 1, [1.65,1.95] -> 2. p: (N,T,2)."""
+    mean_r = np.linalg.norm(p, axis=2).mean(axis=1)          # (N,)
+    edges = np.array([1.35, 1.65])
+    return np.digitize(mean_r, edges).astype(int)            # 0,1,2
+
+
+def start_sector_labels(p, cfg=CFG):
+    """Task 3: angular sector of the loop's STARTING point -> n_sectors classes."""
+    start = p[:, 0, :]                                        # (N,2)
+    theta = np.mod(np.arctan2(start[:, 1], start[:, 0]), 2 * PI)
+    return np.floor(theta / (2 * PI / cfg.n_sectors)).astype(int) % cfg.n_sectors
+
+
+def make_point_regression(cfg=CFG, seed=0):
+    """v3 EU fix: regression point track with NO class boundaries.
+
+    target y = sin(2 theta) + reg_noise * eps on the annulus. Because there are
+    no decision boundaries meeting at the origin, ensemble disagreement over the
+    interior is coverage-driven only (not class-boundary ambiguity)."""
+    rng = np.random.default_rng(seed)
+    p, _ = sample_annulus_points(cfg.n_points, cfg, rng)
+    theta = np.arctan2(p[:, 1], p[:, 0])
+    y = np.sin(2 * theta) + cfg.reg_noise * rng.normal(size=len(p))
+    emb = Embedding(cfg)
+    x = emb(p, noise=cfg.obs_noise, rng=rng)
+    return dict(p=p, x=x, y=y.astype(np.float32))

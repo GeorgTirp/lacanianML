@@ -74,6 +74,12 @@ class GRUBaseline(nn.Module):
         out, _ = self.gru(x)
         return self.head(out[:, -1, :])
 
+    def trunk_features(self, x):
+        """v3: full GRU hidden-state sequence (N, T, gru_hidden) — the trunk
+        representation a new task head reads from during fine-tuning."""
+        out, _ = self.gru(x)
+        return out
+
 
 class ProductEncoder(nn.Module):
     """exp1 product latent: R^D -> R^8 (geometric) x R^2 (phase/S^1).
@@ -96,6 +102,39 @@ class ProductEncoder(nn.Module):
     def forward(self, x):
         z = self.trunk(x)
         return self.geom(z), self.phase(z)
+
+
+class PointRegressor(nn.Module):
+    """v3 EU: small MLP regressor for the regression point track (no class
+    boundaries -> disagreement over the interior is coverage-driven)."""
+
+    def __init__(self, cfg=CFG):
+        super().__init__()
+        h = cfg.ens_hidden
+        self.net = nn.Sequential(
+            nn.Linear(cfg.D, h), nn.ReLU(),
+            nn.Linear(h, h), nn.ReLU(),
+            nn.Linear(h, 1),
+        )
+
+    def forward(self, x):
+        return self.net(x).squeeze(-1)
+
+
+class MeanPoolHead(nn.Module):
+    """v3: per-task head that mean-pools a (N,T,in_dim) feature sequence over T
+    then MLP -> n_classes. Used for A/A_nb (in=2, phase-head outputs) and C
+    (in=gru_hidden, hidden states)."""
+
+    def __init__(self, in_dim, n_classes, hidden):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, hidden), nn.ReLU(),
+            nn.Linear(hidden, n_classes),
+        )
+
+    def forward(self, feats):
+        return self.net(feats.mean(dim=1))
 
 
 def match_report(cfg=CFG):
