@@ -20,7 +20,7 @@ class PhaseEncoder(nn.Module):
     Applied pointwise to every step of a trajectory.
     """
 
-    def __init__(self, cfg=CFG):
+    def __init__(self, cfg=CFG, gate_init_scale=0.02):
         super().__init__()
         h = cfg.enc_hidden
         self.net = nn.Sequential(
@@ -28,6 +28,14 @@ class PhaseEncoder(nn.Module):
             nn.Linear(h, h), nn.Tanh(),
             nn.Linear(h, 2),
         )
+        # Start the phase head near the gate (f ~ 0) so the winding class is
+        # *born* by crossing the gate during installation (Tier-1 protocol).
+        # This is what makes the conservation law observable: winding changes
+        # coincide with min||f|| -> 0 rather than being aliased by the encoder
+        # emitting a large winding at initialization. Shared across A/B/D (§7.2).
+        with torch.no_grad():
+            self.net[-1].weight.mul_(gate_init_scale)
+            self.net[-1].bias.mul_(gate_init_scale)
 
     def forward(self, x):
         """x: (..., D) -> f: (..., 2). Works on (N,T,D) or (N,D)."""
