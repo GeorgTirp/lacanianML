@@ -3,5 +3,5 @@ __pycache__/
 .venv/
 results/*.npz
 results/*.csv
-results/figures/*.png
 .pytest_cache/
+# figures are deliverables -> tracked (results/figures/*.png)
