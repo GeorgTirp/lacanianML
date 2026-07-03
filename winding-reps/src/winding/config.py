@@ -84,6 +84,10 @@ class Config:
                                      # calibrated to raise held-out L_ssl ~3x (forcing
                                      # SSL re-fitting) while the winding survives — the
                                      # encoder is robust until much larger shifts.
+
+    # ---- v5: confound gate / dividend / stabilizer (exp5) ----  additive
+    v5_draws: int = 10               # fresh shift draws per regime (5a-iii, 5c)
+    v5_adapt_steps: int = 1500       # adaptation steps per shift draw
     wn_sigma_lo: float = 0.01        # weight-noise relative sigma range
     wn_sigma_hi: float = 4.0         # extended 1.0->4.0: A's plateau exceeds the
                                      # addendum's pre-registered 1.0 (documented,

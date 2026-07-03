@@ -147,6 +147,26 @@ the general EU-weighted multi-charge construction is out of scope. The drive is 
 term in the *update rule*, not the loss. SGLD is matched by displacement so the
 contrast is directed-vs-isotropic motion at equal energy.
 
+## v5 — confound gate, dividend, stabilizer (exp5)
+
+v5 audits v4's best downstream number and tests the follow-on claims. **exp5a is
+a gate**: if the v4 "drive adapts better" result is an artifact of the winding
+*class dying* (an unwound phase field is relationally easier to fit), the v5
+RESULTS section leads with a **retraction** before any positive result. It does —
+the post-shift L_ssl floor is set entirely by class status (BROKE≈0.00,
+SURVIVED≈0.13), not regime, and the drive is the *most* shift-fragile arm.
+
+- **exp5a (gate):** floor-vs-class-status verdict (ARTIFACT/DIVIDEND/MIXED);
+  gated-breaks check (breaks are discrete-shift onset, not training events);
+  survival rate per regime under fresh shifts (Wilson CIs).
+- **P11 (dividend):** do desaturated (drive-idled) nets learn an *orthogonal*
+  task (mean-radius) faster? Kill if no ordering (dropped, not deferred).
+- **P12 (stabilizer):** a label-free multi-view phase-agreement loss `L_stab`
+  during deployment; does it raise class survival ≥0.3 without hurting L_ssl
+  recovery? A negative would show W1 (relational blindness to topology) extends
+  to global surrogates — class *repair* needs the oracle or a non-relational
+  mechanism.
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -180,6 +200,7 @@ python experiments/exp1_product_latent.py   # M2: product-latent open question
 python experiments/exp2_main.py             # M3–M5: EU map, four arms, full eval
 python experiments/exp3_retention.py        # v3: training-axis retention + weight noise
 python experiments/exp4_drive.py            # v4: the drive (period test, idling, shift)
+python experiments/exp5_dividend.py         # v5: confound gate, dividend, stabilizer
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every

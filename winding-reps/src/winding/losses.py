@@ -34,6 +34,15 @@ def gate_barrier(f, margin, lam_b):
     return lam_b * torch.mean(torch.clamp(margin - norm, min=0.0) ** 2)
 
 
+def stabilizer_loss(phi_v1, phi_v2):
+    """v5 label-free class stabilizer: multi-view phase agreement
+    L_stab = E[1 - cos(phi_v1 - phi_v2)] over two independent observation-noise
+    views of the same underlying point. Anchors the phase field against
+    shift-driven scrambling. The integer winding is monitored, never optimized
+    (W3): this is a continuous surrogate whose side effect is class stability."""
+    return torch.mean(1.0 - torch.cos(phi_v1 - phi_v2))
+
+
 def phase_of(f, eps=1e-8):
     """Angle of the 2D vector(s) f = (u, v): atan2(v, u). Also returns norm."""
     norm = torch.linalg.norm(f, dim=-1, keepdim=True)

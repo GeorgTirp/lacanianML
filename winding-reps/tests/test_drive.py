@@ -67,6 +67,17 @@ def test_drive_orthogonal_to_lssl_on_orbit():
     assert abs(L_dot_T) < 0.05, L_dot_T                # L_ssl flat along the orbit
 
 
+def test_stabilizer_loss_bounds():
+    from winding.losses import stabilizer_loss
+    phi = torch.tensor([0.3, -1.1, 2.0])
+    assert float(stabilizer_loss(phi, phi)) < 1e-7          # identical views -> 0
+    assert abs(float(stabilizer_loss(phi, phi + PI)) - 2.0) < 1e-5  # opposite -> 2
+    # symmetric and non-negative
+    a = torch.tensor([0.5]); b = torch.tensor([1.4])
+    assert float(stabilizer_loss(a, b)) >= 0.0
+    assert abs(float(stabilizer_loss(a, b)) - float(stabilizer_loss(b, a))) < 1e-7
+
+
 def test_drive_advances_phase_counterclockwise():
     enc = _offgate_encoder()
     x = _batch()

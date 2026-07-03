@@ -223,3 +223,95 @@ The drive works **exactly as engineered**: ∮D=2π and ∮∇L_ssl=0 (P8a), and
 ![P10: participation ratio / saturation over idling.](results/figures/exp4_plasticity_P10.png)
 
 *P10: participation ratio / saturation over idling.*
+
+<!-- V5 SECTION -->
+
+# v5 — confound gate, dividend, stabilizer
+
+Seeds: [0, 1, 2]. Runtime: 886s (14.8 min) CPU. 5a-iii/5c: 10 fresh shift draws/regime.
+
+
+## ⚠️ RETRACTION — the v4 adaptation advantage was an artifact (exp5a gate)
+> **The v4 finding that idled DRIVE 'recovers L_ssl fastest / to the lowest floor' is RETRACTED.** exp5a-i (analysis of the *committed v4 logs*, no new runs) shows the post-shift L_ssl floor is set ENTIRELY by winding-class status, not by regime: **BROKE arms floor = 0.000** (across-regime spread 0.000, n=11) vs **SURVIVED arms floor = 0.133** (spread 0.008, n=7). DRIVE reached the low floor precisely because it *lost the winding class* — an unwound phase field is trivially fittable by relational SSL, and the topological constraint carries a real fitting cost ≈0.13. Worse for the drive: it is the MOST shift-fragile regime (breaks per 3 seeds: FROZEN=2, SSL=2, SGLD_lo=1, SGLD_hi=1, DRIVE_lo=3, DRIVE_hi=2). There is no plasticity advantage in the v4 adaptation numbers; the dividend is re-tested cleanly below (5b) on a task orthogonal to the winding class.
+
+
+### 5a-i floor-by-class-status table
+
+| regime | seed | end winding-acc | status | L_ssl floor |
+|---|---|---|---|---|
+| FROZEN | 0 | 1.00 | SURVIVED | 0.136 |
+| FROZEN | 1 | 0.33 | BROKE | 0.000 |
+| FROZEN | 2 | 0.33 | BROKE | 0.000 |
+| SSL | 0 | 1.00 | SURVIVED | 0.128 |
+| SSL | 1 | 0.33 | BROKE | 0.000 |
+| SSL | 2 | 0.33 | BROKE | 0.000 |
+| SGLD_lo | 0 | 1.00 | SURVIVED | 0.135 |
+| SGLD_lo | 1 | 1.00 | SURVIVED | 0.134 |
+| SGLD_lo | 2 | 0.33 | BROKE | 0.000 |
+| SGLD_hi | 0 | 1.00 | SURVIVED | 0.131 |
+| SGLD_hi | 1 | 1.00 | SURVIVED | 0.129 |
+| SGLD_hi | 2 | 0.33 | BROKE | 0.000 |
+| DRIVE_lo | 0 | 0.33 | BROKE | 0.000 |
+| DRIVE_lo | 1 | 0.33 | BROKE | 0.000 |
+| DRIVE_lo | 2 | 0.33 | BROKE | 0.000 |
+| DRIVE_hi | 0 | 0.33 | BROKE | 0.000 |
+| DRIVE_hi | 1 | 0.33 | BROKE | 0.000 |
+| DRIVE_hi | 2 | 1.00 | SURVIVED | 0.136 |
+
+### 5a-ii are the breaks gated?
+
+- Of 11 class breaks in v4 adaptation, **6 occurred at the discrete shift onset** (winding already broken at adapt step 0) and 5 during adaptation. The breaks are caused by the discrete distribution SHIFT (a jump in input space), not by a continuous training step — so they are 'ungated' in the training-dynamics sense by construction. The conservation law protects against continued *training* (v3/v4), never against the world changing; no discrete-step tunneling investigation is warranted.
+
+
+## 5a-iii class survival under fresh shifts (no stabilizer)
+
+| regime | survival rate | 95% CI | mean L_ssl recovery steps |
+|---|---|---|---|
+| FROZEN | 0.40 (4/10) | [0.17, 0.69] | 145 |
+| SSL | 0.40 (4/10) | [0.17, 0.69] | 210 |
+| SGLD_hi | 0.40 (4/10) | [0.17, 0.69] | 215 |
+| DRIVE_hi | 0.20 (2/10) | [0.06, 0.51] | 100 |
+
+DRIVE survival < FROZEN (0.20 vs 0.40); CIs are wide at n=10 — no strong claim on overlaps, but the point estimate is consistent with the 5a-i finding that motion-at-shift adds fragility.
+
+
+## 5b — plasticity dividend (P11), orthogonal mean-radius task
+
+| P11 | desaturated (DRIVE) nets learn a new task faster | ❌ FAIL (dividend DROPPED) | DRIVE<FROZEN&SSL in 0/3 seeds; Spearman ρ(saturation,steps-to-90%)=0.02; DRIVE final acc=1.00 vs FROZEN=1.00 |
+
+> **P11 dividend DROPPED (not deferred).** The desaturation is physiological (v4: 0.36→0.05 saturated units) but does not translate into faster new-task learning at this scale/ordering. Per the addendum kill rule, the dividend claim is dropped until a scale where it reappears.
+
+
+## 5c — label-free class stabilizer (P12)
+
+Pilot (seed 0, then FROZEN): λ_stab candidates {1.0: 0.5, 3.0: 0.5} → chose **λ_stab=1**.
+
+| P12 | L_stab raises survival ≥0.3 pooled without hurting L_ssl recovery >50 steps | ❌ FAIL | pooled survival 0.35→0.33 (Δ-0.03); pooled L_ssl recovery 168→161 steps (Δ-6) |
+
+| regime | survival base → +L_stab |
+|---|---|
+| FROZEN | 0.40 → 0.40 |
+| SSL | 0.40 → 0.30 |
+| SGLD_hi | 0.40 → 0.40 |
+| DRIVE_hi | 0.20 → 0.20 |
+
+> **P12 negative (worth its own paragraph).** A multi-view global surrogate does NOT reinstall a broken winding class: W1 (relational blindness to topology) extends to L_stab too. Once the shift tunnels the phase field across the gate, agreement between two noise views of the *shifted* inputs re-anchors the (already-wrong) class rather than the original — so class REPAIR needs either the oracle angular supervision or a fundamentally different (non-relational) mechanism. A real limit, not a tuning failure.
+
+
+## Figures
+
+![P11: pre-task saturation vs new-task learning speed + curves.](results/figures/exp5_dividend_P11.png)
+
+*P11: pre-task saturation vs new-task learning speed + curves.*
+
+![5a-iii vs 5c: class survival under fresh shifts, ±L_stab.](results/figures/exp5_survival_P12.png)
+
+*5a-iii vs 5c: class survival under fresh shifts, ±L_stab.*
+
+
+## Pre-registration hygiene (§4)
+
+- Ballisticity metric unchanged (v4 §7.1: baseline-subtracted net advance + η_d scaling). Drive constants, deploy lr 3e-4, grad clip, margins/λ_b: unchanged.
+- λ_stab fixed by the documented seed-0 pilot (1) before the pre-registered survival runs.
+- Checkpoints were regenerated by re-idling (v4 did not persist encoders); the idle protocol/seeds are identical to v4, so the idled states reproduce v4's.
+
