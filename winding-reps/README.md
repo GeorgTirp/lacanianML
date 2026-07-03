@@ -167,6 +167,37 @@ SURVIVED≈0.13), not regime, and the drive is the *most* shift-fragile arm.
   to global surrogates — class *repair* needs the oracle or a non-relational
   mechanism.
 
+## v6 — ring attractor: topology in the dynamics (exp6)
+
+A pivot, not a patch. Tiers 2–5 painted S¹ onto the static readout map
+`φ = f/‖f‖`; every deployment failure (uninstallable without oracle, unrepairable
+after a shift, shattered by input jumps, 2-unit bottleneck) traced to that
+staticness. v6 moves the circle into **fixed recurrent connectivity** — a
+continuous ring attractor (N=64 units, cosine connectivity) — and only learns the
+encoder `e_ψ` that injects input current onto it. The topology is supplied by the
+recurrence; descent never has to create the hole. Biological existence proofs (not
+evidence): head-direction ring attractors and grid-cell tori (Chaudhuri et al.
+2019; Gardner et al. 2022).
+
+- **P13** the settled-state cloud is a ring (b1=1, certified by angular coverage +
+  radial concentration + loop-persistence; pre-committed thresholds).
+- **P14** winding is tracked (acc ≥ 0.9) and conserved under continued training
+  (probe-W / b1 constant absent a bump-collapse).
+- **P15 (money) — repair by relaxation:** under the exp5 shift, does letting the
+  ring *relax* (no oracle, no gradients) recover the winding a static decode
+  loses? Pass = dynamic − static ≥ 0.3. **Kill K-repair** if dynamic ≈ static.
+- **P16** intrinsic drive: an antisymmetric connectivity term circulates the bump
+  spontaneously at zero input (velocity ∝ η) — the drive as a property of the
+  module, not an optimizer term.
+- **P17** (exploratory) reading the full N-dim population vs the 2-unit bottleneck.
+
+Kills: **K-ring** (no attractor), **K-repair** (relaxation buys nothing — the
+make-or-break), **K-drift** (continuous attractors are connectivity-fine-tuned;
+measure bump drift before claiming repair). Installation is oracle-assisted
+(standing fairness note): a relational-only objective admits the W1-trivial
+stationary-bump solution. The novel claim (P15 repair) uses no oracle. The EU-as-
+lack coupling (gain set by enclosed variance) is wired as a hook, tested in v7.
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -201,6 +232,7 @@ python experiments/exp2_main.py             # M3–M5: EU map, four arms, full e
 python experiments/exp3_retention.py        # v3: training-axis retention + weight noise
 python experiments/exp4_drive.py            # v4: the drive (period test, idling, shift)
 python experiments/exp5_dividend.py         # v5: confound gate, dividend, stabilizer
+python experiments/exp6_ring.py             # v6: ring attractor (P13-P17, repair test)
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every

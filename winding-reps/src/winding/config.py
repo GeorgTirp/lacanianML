@@ -88,6 +88,22 @@ class Config:
     # ---- v5: confound gate / dividend / stabilizer (exp5) ----  additive
     v5_draws: int = 10               # fresh shift draws per regime (5a-iii, 5c)
     v5_adapt_steps: int = 1500       # adaptation steps per shift draw
+
+    # ---- v6: ring attractor (exp6) ----  additive
+    # Topology lives in the FIXED recurrent weights; only e_psi is learned.
+    N_ring: int = 64                 # ring units, preferred angles 2*pi*i/N
+    ring_J0: float = -1.2            # uniform (inhibitory) recurrent term
+    ring_J1: float = 4.0             # cosine (ring) recurrent term (> bump threshold)
+    ring_h0: float = 0.10            # uniform background input
+    ring_tau: float = 1.0
+    ring_dt: float = 0.1
+    ring_R: int = 25                 # relaxation steps to settle a bump per input
+    ring_R_rep: int = 40             # extra relaxation steps for P15 repair
+    ring_eta: float = 0.0            # asymmetric drive strength (P16 sets > 0)
+    ring_input_gain: float = 1.0     # scales encoder current onto the ring
+    ring_install_steps: int = 250    # oracle-assisted install of e_psi (fairness note)
+    ring_R_train: int = 5            # relaxation steps per input during training
+    ring_shifts: int = 10            # P15 fresh shift draws
     wn_sigma_lo: float = 0.01        # weight-noise relative sigma range
     wn_sigma_hi: float = 4.0         # extended 1.0->4.0: A's plateau exceeds the
                                      # addendum's pre-registered 1.0 (documented,
