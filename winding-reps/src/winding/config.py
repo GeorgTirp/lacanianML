@@ -64,6 +64,26 @@ class Config:
     ft_target_acc: float = 0.95      # early-stop task accuracy
     ft_grad_clip: float = 1.0        # grad-norm clip so the barrier stays effective
     ft_log_every: int = 10           # fine-tune logging cadence (fine enough for gates)
+
+    # ---- v4: the drive (exp4) ----  additive only
+    deploy_lr: float = 3e-4          # SSL deployment lr (shared). Lowered from 1e-3
+                                     # so SSL's incidental global-phase drift stays
+                                     # below the drive signal (see RESULTS §7.1 note).
+    drive_kmax: int = 8              # relational L_ssl step offsets k in {1..kmax}
+    drive_steps_idle: int = 15000    # exp4b idling horizon
+    drive_steps_shift: int = 5000    # exp4c adaptation horizon
+    drive_log_every: int = 50
+    # target mean per-step phase advance. Raised from the addendum's (1e-3, 1e-2)
+    # to clear the SSL phase-noise floor (~2.5e-3 rad/step) at this toy scale so
+    # the ballistic signal is clean; documented per §7.1.
+    drive_advance_lo: float = 2e-2   # DRIVE-lo
+    drive_advance_hi: float = 4e-2   # DRIVE-hi
+    drive_calib_steps: int = 200     # steps used to calibrate eta_d and SGLD sigma
+    n_phase_probe: int = 256         # fixed probe set for the cumulative-phase Phi(t)
+    shift_strength: float = 3.0      # exp4c sensor-drift rotation (=> Q=exp(6*S));
+                                     # calibrated to raise held-out L_ssl ~3x (forcing
+                                     # SSL re-fitting) while the winding survives — the
+                                     # encoder is robust until much larger shifts.
     wn_sigma_lo: float = 0.01        # weight-noise relative sigma range
     wn_sigma_hi: float = 4.0         # extended 1.0->4.0: A's plateau exceeds the
                                      # addendum's pre-registered 1.0 (documented,

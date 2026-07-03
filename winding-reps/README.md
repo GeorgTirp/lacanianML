@@ -121,6 +121,32 @@ coverage-driven; its only requirement is landing inside the hole (per P1b).
 ordinary training; it does not implement any active circulation/update-rule
 change — a separate later tier.
 
+## v4 — the drive (exp4, Tier-3)
+
+The first *active* component: a **closed non-exact** term in the **update rule**
+(not the loss — a real-valued loss cannot circulate, since dL/dt=−‖∇L‖²≤0). The
+flow is `θ_{t+1} = θ_t − η∇(L_ssl+L_bar) + η_d·D(θ)`, where D is the pullback of
+the angular 1-form dθ=(u dv−v du)/(u²+v²), advancing every sample's phase along
+the data-unidentified U(1) fiber. The streaming loss `L_ssl` is **relational**
+(depends only on phase *differences*), so the global phase is an exact symmetry —
+the fiber the drive sweeps. Comparators: FROZEN, continual SSL, and **SGLD**
+(SSL + isotropic noise — the "just add noise" null), calibrated to **matched
+per-step displacement**.
+
+- **P8a (period test):** ∮D≈2π (closed non-exact), ∮∇L_ssl≈0 (exact).
+- **P8 (idling):** DRIVE Φ(t) ballistic (R²>0.99, slope∝η_d) while SGLD at matched
+  displacement is diffusive; DRIVE conserves the winding at no L_ssl cost.
+- **P9 (shift adaptation):** does idling preserve adaptability? DRIVE in the top
+  group on adaptation AND retention.
+- **Kill criteria (headline prominence):** K1 the drive doesn't drive / unstable;
+  K2 the drive causes ungated winding loss; K3 the directed motion buys nothing
+  measurable downstream (DRIVE≈SGLD on retention, ≈FROZEN on adaptation).
+
+**Scope:** ONE global unidentified fiber (the U(1) phase) ⇒ one implicit charge;
+the general EU-weighted multi-charge construction is out of scope. The drive is a
+term in the *update rule*, not the loss. SGLD is matched by displacement so the
+contrast is directed-vs-isotropic motion at equal energy.
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -153,6 +179,7 @@ python experiments/exp0_sanity.py           # M1: conservation + gate reproducti
 python experiments/exp1_product_latent.py   # M2: product-latent open question
 python experiments/exp2_main.py             # M3–M5: EU map, four arms, full eval
 python experiments/exp3_retention.py        # v3: training-axis retention + weight noise
+python experiments/exp4_drive.py            # v4: the drive (period test, idling, shift)
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every
