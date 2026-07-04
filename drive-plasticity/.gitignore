@@ -1,0 +1,6 @@
+data/*.gz
+data/*.npz
+__pycache__/
+*.pyc
+results/*.npy
+.pytest_cache/
