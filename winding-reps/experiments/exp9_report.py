@@ -192,6 +192,6 @@ def _decay_fig(c, seeds):
     ge = frac[np.array(d["gate"]) == 1]
     for g in ge:
         ax.axvline(g, color="gray", alpha=0.3)
-    ax.set(title="P-C1: A₂ heals (charge→0, circulation→0); A₁ stable", xlabel="A₂ fill fraction",
-           ylabel="normalized"); ax.legend(fontsize=8)
+    ax.set(title="Part C: A₂'s measured charge q̂₂→0 as it fills (ρ₂ below cross-talk floor — remeasured in C′)",
+           xlabel="A₂ fill fraction", ylabel="normalized"); ax.legend(fontsize=8)
     fig.tight_layout(); fig.savefig(fig_path("exp9_decayC.png"), dpi=120); plt.close(fig)

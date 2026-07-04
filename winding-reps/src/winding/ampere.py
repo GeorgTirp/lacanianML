@@ -206,12 +206,15 @@ def head_drive(model, x, i, margin):
     return grads, params, float(flat.norm())
 
 
-def apply_charge_drive(model, x, qhat, kappa, margin):
+def apply_charge_drive(model, x, qhat, kappa, margin, mask=None):
     """theta += kappa Σ_i q̃_i * normalize(D^i). q̃ = q/Σq (fixed scale across
-    worlds). Returns per-head applied magnitudes."""
+    worlds). mask (per head) disables a head's drive — used by the C′ lock-in to
+    chop the dominant head during measurement windows. Returns applied magnitudes."""
     qsum = sum(qhat) + 1e-12
     mags = []
     for i, q in enumerate(qhat):
+        if mask is not None and not mask[i]:
+            mags.append(0.0); continue
         grads, params, gnorm = head_drive(model, x, i, margin)
         coef = kappa * (q / qsum) / (gnorm + 1e-12)
         with torch.no_grad():
@@ -219,6 +222,49 @@ def apply_charge_drive(model, x, qhat, kappa, margin):
                 p.add_(coef * g)
         mags.append(coef * gnorm)
     return mags
+
+
+class IndepHeads(nn.Module):
+    """C′-3 attribution control: two FULLY separate encoders (no shared params ⇒
+    no cross-talk by construction). Drop-in for TwoHead (.f, .head_params)."""
+
+    def __init__(self, cfg=CFG, gate_init=0.02):
+        super().__init__()
+        h = cfg.enc_hidden
+        self.enc = nn.ModuleList([
+            nn.Sequential(nn.Linear(cfg.D, h), nn.Tanh(), nn.Linear(h, h), nn.Tanh(),
+                          nn.Linear(h, 2)) for _ in range(2)])
+        with torch.no_grad():
+            for e in self.enc:
+                e[-1].weight.mul_(gate_init); e[-1].bias.mul_(gate_init)
+
+    def f(self, x, i):
+        return self.enc[i](x)
+
+    def head_params(self, i):
+        return list(self.enc[i].parameters())
+
+
+def lockin_measure(step_fn, steps, N=200, W=50):
+    """Duty-cycled lock-in. Each period N has a W-step window where the DOMINANT
+    head's drive is chopped (mask=[False,True]); outside, both drive ([True,True]).
+    step_fn(mask) applies the drive and returns (circ_mean φ1, circ_mean φ2).
+    ρ₂ is measured only INSIDE windows (cross-talk removed); ρ₁ only OUTSIDE.
+    """
+    phi1, phi2, inwin = [], [], []
+    for t in range(steps):
+        win = (t % N) < W
+        p1, p2 = step_fn([False, True] if win else [True, True])
+        phi1.append(p1); phi2.append(p2); inwin.append(win)
+    inwin = np.array(inwin)
+    u1, u2 = np.unwrap(phi1), np.unwrap(phi2)
+    d1, d2 = np.diff(u1), np.diff(u2)
+    w = inwin[1:]
+    rho2 = float(np.mean(d2[w])) if w.any() else 0.0          # window steps (head1 off) — clean
+    rho2_raw = float(np.mean(d2[~w])) if (~w).any() else 0.0  # non-window (both on) — contaminated
+    rho1 = float(np.mean(d1[~w])) if (~w).any() else 0.0      # non-window steps
+    return dict(rho1=rho1, rho2=rho2, rho2_raw=rho2_raw,
+                u1=u1.tolist(), u2=u2.tolist(), inwin=inwin.tolist())
 
 
 # --------------------------------------------------------------------------- #
