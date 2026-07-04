@@ -379,3 +379,59 @@ The ring's topological centre — the state 'no location represented' — is the
 
 *P16: intrinsic circulation Φ(t) at zero input, two η (velocity ∝ η).*
 
+<!-- V3B SECTION -->
+
+# v3b — probe-recovery control (the outstanding P5 gate)
+
+Seeds: [0, 1, 2]. Runtime: 36s (0.6 min) CPU. Pre-registration LOCKED 2026-07-04.
+
+
+**Required data deviation (flagged):** loop radius r0 ~ U[1.15,1.85] per loop (exp2 default r=1.5 makes Task-2 mean-radius degenerate/non-interfering — the tell is v3 P7's radius acc 1.0 for every arm). Task-2 class balance (seed0): [166, 249, 185] — all three classes populated.
+
+
+## Gates
+
+- **Reproduction gate** (frozen-head winding acc after Task 3 must be <0.7): frozen_final per seed = [0.34, 0.397, 0.283] → PASS — forgetting reproduced.
+
+- **Sanity anchor** (P_pre ≥ 0.9, else pipeline broken): P_pre per seed = [0.993, 1.0, 1.0] → PASS.
+
+- **Confound clause** (P_rand > 0.8 under primary → shift to secondary): P_rand(primary) per seed = [0.403, 0.453, 0.33] → clear.
+
+
+## Verdict — 0.3<R<0.8 -> PARTIAL EROSION: P5 restated as graded trunk degradation
+
+> Recovery ratio **R = 0.66** (primary family 'primary', per seed [0.56, 0.73, 0.68]). P_pre=1.00 (info present), P_ft=0.79 (fine-tuned trunk), P_rand=0.40 (random-feature reservoir). Chance = 0.33.
+
+> 
+> **P5 restated (graded):** the trunk partially eroded the invariant; the contrast with A's *zero* erosion survives but the 'C forgot entirely' framing is weakened to graded degradation.
+
+
+## All probe accuracies (held-out winding, 3-seed mean)
+
+| trunk | primary (final-hidden) | secondary (mean-pool) | exploratory (MLP) |
+|---|---|---|---|
+| T_pre (upper anchor) | 0.998 | 0.998 | 0.999 |
+| T_ft (fine-tuned) | 0.790 | 0.780 | 0.993 |
+| T_rand (reservoir) | 0.396 | 0.531 | 0.976 |
+
+> **Exploratory family is NON-DIAGNOSTIC (reservoir confound realized).** The generous MLP probe reaches P_rand=0.976 on the RANDOM trunk — a random GRU's features over the T×64 sequence already support near-perfect winding decoding with a nonlinear reader. So its high T_ft recovery proves nothing about retention. This is exactly why the band is decided by the LINEAR primary probe (reservoir P_rand=0.40, well clear of confound). The exploratory row confirms the invariant is nonlinearly *present* in T_ft, but that reading cannot be separated from the reservoir; the honest, confound-free verdict is the linear one.
+
+
+## What would change our mind
+
+- If a *deeper* probe (family c) recovered winding from T_ft where the primary did not, the invariant is present but nonlinearly encoded — H-drift with a caveat on readout complexity.
+- If P_rand were > 0.8 (random-GRU reservoir already decodes winding over the T×64 sequence), the control is non-diagnostic — a fresh probe's success would prove nothing about retention.
+- If the reproduction gate had failed (frozen acc ≥ 0.7), the whole comparison is moot: no forgetting to explain.
+- The residual contrast is robust regardless of R: A's readout is parameter-free and needed no data; any C recovery needs labels + optimization. R only decides whether the words 'C forgot' are literally true of the trunk.
+
+
+## Figures
+
+![C frozen-head winding accuracy collapsing during fine-tuning.](results/figures/exp3b_retention.png)
+
+*C frozen-head winding accuracy collapsing during fine-tuning.*
+
+![Winding recoverable from each trunk by fresh probes (P_pre/P_ft/P_rand).](results/figures/exp3b_probes.png)
+
+*Winding recoverable from each trunk by fresh probes (P_pre/P_ft/P_rand).*
+

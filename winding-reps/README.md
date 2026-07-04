@@ -103,6 +103,12 @@ evaluation.
   winding accuracy stays ≥ 0.99 absent gate events (any drop must coincide with
   a gate event); C's degrades. If A_nb ≈ A, the barrier is not load-bearing
   (typing alone protects) — reported.
+  **[Refined by v3b, see below]:** a probe-recovery control shows C's frozen-head
+  collapse *overstates* trunk information loss — a fresh linear probe recovers
+  winding to ~0.79 from C's fine-tuned trunk (R=0.66, partial erosion). P5 is
+  restated as *graded trunk degradation + total readout-access loss*, versus A's
+  zero erosion and parameter-free readout. The strong "C forgot the invariant"
+  wording is retracted as stated.
 - **P6 (weight-noise plateau–cliff):** add per-layer-scaled Gaussian weight
   noise; A holds an exact plateau far past C, and A's per-loop failures are
   gate-mediated (failed loops sit closer to the gate); C degrades smoothly.
