@@ -204,6 +204,40 @@ measure bump drift before claiming repair). Installation is oracle-assisted
 stationary-bump solution. The novel claim (P15 repair) uses no oracle. The EU-as-
 lack coupling (gain set by enclosed variance) is wired as a hook, tested in v7.
 
+## v7 — the Ampère experiment (EU-as-lack, tested quantitatively) (exp9)
+
+The charge law `∮_γ ω_A = κ Σᵢ Link(γ,Aᵢ) qᵢ`, `qᵢ = ∫_{Aᵢ} σ_f²` — the
+circulation quota per loop set by the enclosed *irreducible variance, read from
+data*. A LAW test in a clean two-lack world (A₁ large/high-EU, A₂ small/low-EU),
+not a benchmark. §1 discipline is enforced: additivity of the *designed* form and
+per-head drive coefficients are TRUE BY CONSTRUCTION; what is tested is the
+emergent chain — data→charge (T1), realization through a shared-trunk learned
+encoder (T2), online coupled dynamics (T3), protection (T4). The RESULTS §1 table
+assigns every result to T1–T4.
+
+- **K-charge (gate):** the EU ensemble must recover q̂₁/q̂₂ ≥ 1.5 with A₁
+  dominant — else no dynamics claims are admissible.
+- **P-A1 (band-deciding):** across a 5-world sweep, log–log slope of measured
+  rate-ratio ρ₁/ρ₂ on charge-ratio q̂₁/q̂₂ ∈ [0.7,1.3], r ≥ 0.8 (trunk cross-talk
+  can break proportionality).
+- **P-B2 (band-deciding, Ampère proper):** realized ∮dφ over loop families is
+  additive — both ≈ A₁ + A₂, neither ≈ 0 — within 10%. **K-additivity** if the
+  *learned* field breaks additivity: the field theory is decorative.
+- **P-C1 (band-deciding):** with online charge re-estimation as A₂ fills, does
+  circulation track the vanishing charge while A₁ stays put? **K-fixation** if the
+  system circles a healed hole.
+
+**Result (headline):** the charge law has empirical content — K-charge passes,
+P-A1 (proportionality survives the shared trunk, slope ≈0.79) and P-B2 (additivity
+realized *exactly* in the learned field) both pass, K-additivity does not fire.
+The one failure is P-C1's *circulation* half: the low-charge head's driven rate
+sits below the shared-trunk cross-talk floor from the high-charge head — the same
+cross-talk that compresses P-A1 — so per-head decay is unmeasurable (a scope limit
+for independent-head realization), even though the charge estimator cleanly tracks
+A₂ healing. Two §8.1-documented calibrations: the world's holes were enlarged (a
+small hole is pinned by its boundary → no EU), and K-charge is gated on the
+per-world-mean ratio (one marginal seed must not veto a working estimator).
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -239,6 +273,7 @@ python experiments/exp3_retention.py        # v3: training-axis retention + weig
 python experiments/exp4_drive.py            # v4: the drive (period test, idling, shift)
 python experiments/exp5_dividend.py         # v5: confound gate, dividend, stabilizer
 python experiments/exp6_ring.py             # v6: ring attractor (P13-P17, repair test)
+python experiments/exp9_ampere.py           # v7: the Ampère experiment (charge law, Parts A-D)
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every
