@@ -51,7 +51,7 @@ def _step_fn(model, xdrive, probes, qhat):
     return step
 
 
-def run_arm(arm, w, seed, q_traj):
+def run_arm(arm, w, seed, q_traj, steps=1000):
     ctor = A.IndepHeads if arm == "indep" else A.TwoHead
     m = ctor(CFG)
     # locate holes for install (use oracle centers; P1b: homotopy-correct suffices)
@@ -68,7 +68,7 @@ def run_arm(arm, w, seed, q_traj):
         # measurement and re-estimate only the FILLING hole q̂₂ (re-estimating a static
         # lack each refit only injects estimator noise the drive would faithfully follow).
         out = A.lockin_measure(_step_fn(m, xdrive, probes, [q1s[0], q2s[k]]),
-                               steps=1000, N=200, W=50)
+                               steps=steps, N=200, W=50)
         rho2w.append(out["rho2"]); rho2raw.append(out["rho2_raw"]); rho1.append(out["rho1"])
         with torch.no_grad():
             _, nrm = phase_of(m.f(probes[1], 1))

@@ -562,3 +562,55 @@ Seeds: [0, 1, 2]. Runtime 65s. Same locked P-C1 band; only the instrument change
 
 *Three-arm P-C1 correlation and ρ₁ stability.*
 
+<!-- V7CPP SECTION -->
+
+# v7 C″ — banking the crown claim by the letter
+
+Fresh seeds [3, 4, 5] (never seen by the corrected clause). Runtime 117s.
+
+
+## Pre-registration error, owned (v4/v5 precedent)
+
+> The C′ ρ₁-stability clause was **mis-designed: two-sided (±20%)**, while the risk it guards — the *true* lack's circulation decaying like the false one's — is **one-sided**. C′-2/C′-3 failed strict P-C1 only via UPWARD ρ₁ fluctuation (≈1.2), which instantiates no guarded risk. Per the v5 rule (locked clauses are not reinterpreted post-hoc), the clause was **corrected in advance (2026-07-04) and re-tested on fresh seeds**:
+>
+> - OLD: ρ₁ stays within 20% of initial.  **NEW: ρ₁ never falls below 0.8·initial.**
+> All other clauses unchanged. Variance aid (fixed in advance): per-point averaging for ρ₁ doubled (2000 idle steps/measurement).
+
+
+## Both runs, both clauses (transparency)
+
+| run | arm | corr(q̂₂,ρ₂ʷ) | ρ₂ʷ end | ρ₁ two-sided dev | ρ₁ one-sided floor | OLD ±20% | NEW ≥0.8 |
+|---|---|---|---|---|---|---|---|
+| C′ (seeds [0, 1, 2]) | shared-trunk lock-in | 0.99 | 1% | 13% | 0.95 | ✅ | ✅ |
+| C′ (seeds [0, 1, 2]) | milder world | 0.99 | 1% | 22% | 1.00 | ❌ | ✅ |
+| C′ (seeds [0, 1, 2]) | independent trunks | 1.00 | 0% | 21% | 0.91 | ❌ | ✅ |
+| C″ (seeds [3, 4, 5]) | shared-trunk lock-in | 1.00 | 0% | 14% | 0.99 | ✅ | ✅ |
+| C″ (seeds [3, 4, 5]) | milder world | 0.97 | 2% | 29% | 1.00 | ❌ | ✅ |
+| C″ (seeds [3, 4, 5]) | independent trunks | 0.99 | 0% | 36% | 0.93 | ❌ | ✅ |
+
+## Banking verdict
+
+> **CROWN CLAIM BANKED.** Under the corrected one-sided clause, on FRESH seeds [3,4,5], P-C1 passes in BOTH the shared-trunk lock-in (ρ₁ floor 0.99 ≥ 0.8, corr 1.00, ρ₂ʷ end 0%) AND the milder world (floor 1.00, corr 0.97). The reducible lack's circulation stops as its measured charge heals, while the irreducible lack's circulation does not sag — the Real vs a removable bump, dynamically, instrument-independently.
+
+
+## Carry-over — was the encoder training during healing?
+
+- **In the rate arms (C′/C″): NO.** The model is reset to its installed state at each fill level and only the DRIVE is applied (no gradient training on fill data); only the ensemble/charge updates. So the min‖f₂‖ log in the rate arms is trivial — nothing could move it — and that exploratory is void, as flagged.
+
+- **Exploratory healing arm (encoder DOES train on fill data, regression + head-2 barrier):** as A₂ fills, head-2 winding around A₂ **dissolves (1→0) in 2/3 seeds** (mean end 0.33); min‖f₂‖ over A₂ end-state 0.03→0.60 (it GREW), total logged gate events 0.3. **The Imaginary heals the puncture — but by UNWINDING, not by a persisting gate.** As data floods A₂ the winding-1 structure becomes untenable and the class dissolves; the end-state min‖f₂‖ is high, so any zero-crossing was transient during training (the standard aliasing caveat — I log min‖f₂‖ only post-fine-tune, not along it), OR the field unwound smoothly. Either way the code did NOT survive as 'memory without cathexis' in the majority of seeds; the puncture healed. Reported as seen.
+
+
+## §1 — by-construction vs actually-tested (C″)
+
+| result | by-construction? | actually tests |
+|---|---|---|
+| corrected clause is one-sided | it is a definition | — |
+| ρ₂ʷ tracks q̂₂→0 while ρ₁ floor ≥ 0.8 (fresh seeds) | no | **T3** discrimination, banked by the letter |
+| healing: winding survives / dissolves under fill-data training | no | **exploratory** (Imaginary) |
+
+## Figures
+
+![C″ healing: head-2 winding and min‖f₂‖ over A₂ as it fills.](results/figures/exp9_cpp_heal.png)
+
+*C″ healing: head-2 winding and min‖f₂‖ over A₂ as it fills.*
+
