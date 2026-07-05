@@ -73,3 +73,82 @@ KEPT: directed (rotating d in a fixed flat 2-plane), confined to the low-curvatu
 
 *Dead-unit fraction and feature rank over the stream.*
 
+<!-- VALLEY1 SECTION -->
+
+# valley-1 — the gauge-orbit drive (exact-symmetry circulation)
+
+Model: MLP width 64 depth 2. Permuted-MNIST, 2000/2000 train/test per task. Seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]. Idle patrol K=200 steps (1/4 of the 800-step Lissajous period, amp=0.3) -- stops a quarter of the way around the closed loop, parked away from theta*, not returned to it. New-task budget = 8 epochs. Threshold acc=0.8. Runtime 6s.
+
+
+## §4.1 — exact invariance audit (validated invariant, NOT a finding)
+
+> Max |f_θ(t)(x) − f_θ(0)(x)| over the GAUGE patrol, across all seeds and all 200 steps: **4.58e-05** (gate: < 1e-4). PASSES — the rescaling is exact, as it must be by construction.
+
+
+## Kill-criteria verdict (§4.2, reported first)
+
+> **❌ K-noteeth.** Steps-to-threshold (acc≥0.8) on the new task: PLAIN 36.0, GAUGE 34.4 (+4.4% vs PLAIN, need ≥15% fewer), ISO 32.0. Final test loss: GAUGE 0.411 vs ISO 0.404 (GAUGE must be lower).
+
+> 
+> **K-noteeth — a clean, important negative.** GAUGE ≈ PLAIN on both speed and final loss: where you sit on the gauge orbit has NO measurable operational consequence, despite the orbit being real, exact, and analytically known (no estimation error, unlike exp7's vacuous curvature subspace). The frozen minimum θ* is arbitrary in a representational sense (Git Re-Basin) but that arbitrariness carries no plasticity cash value on this axis. This does NOT touch valley-2's topological claim (identity, not plasticity).
+
+
+## Steps-to-threshold, final loss/acc, by arm
+
+| arm | steps-to-thr (mean±sd) | reached within budget | final loss | final acc | first-task-1 grad norm | ‖θ − θ*‖ post-patrol |
+|---|---|---|---|---|---|---|
+| PLAIN | 36.0±4.7 | 100% | 0.402±0.064 | 0.877 | 2.43±0.37 | 0.000±0.000 |
+| GAUGE | 34.4±7.8 | 100% | 0.411±0.072 | 0.873 | 2.43±0.37 | 0.377±0.009 |
+| ISO | 32.0±7.6 | 100% | 0.404±0.060 | 0.875 | 2.43±0.37 | 0.030±0.001 |
+
+- Note (§3): displacement is matched PER-STEP, not cumulatively — GAUGE's directed, coherent motion covers ~13x more raw parameter distance than ISO's random walk over the same K steps at the same per-step budget (ballistic vs diffusive net displacement, the same asymmetry as the topological drive's circulation-rate advantage elsewhere in this program). GAUGE nonetheless does not convert that larger reach into a plasticity advantage here (see verdict above).
+
+
+## Old-task retention after patrol (corollary — not a P-G1 clause)
+
+- Task-0 **accuracy** right after training (θ*): 0.723. After the idle patrol: PLAIN 0.723, GAUGE 0.7229 (bit-identical to PLAIN, every seed — must equal θ*'s accuracy exactly, same function, by §4.1), ISO 0.7229 (also indistinguishable from PLAIN at this precision — the discrete argmax accuracy metric on 2000 examples is too coarse to register a ~0.03-norm parameter perturbation against confident, well-separated decisions).
+- The continuous **test loss** confirms GAUGE matches PLAIN to numerical precision in every seed (mean diff -1.31e-07 — must be exactly 0 up to float error, §4.1 guarantees identical logits). ISO's loss differs from PLAIN by a mean signed -3.82e-05 (mean absolute 1.33e-04, 4/10 seeds higher) — a real but tiny, NON-systematic perturbation at this displacement scale, not a directional 'erosion cost'; too small to read as a stability advantage for GAUGE on this axis.
+
+
+## §4.3 mediators — weight-norm balance and layer conditioning
+
+| arm | layer | CV pre | CV post | cond pre | cond post |
+|---|---|---|---|---|---|
+| PLAIN | 0 | 0.125 | 0.125 | 3.9 | 3.9 |
+| PLAIN | 1 | 0.128 | 0.128 | 1579.6 | 1579.6 |
+| GAUGE | 0 | 0.125 | 0.130 | 3.9 | 3.9 |
+| GAUGE | 1 | 0.128 | 0.137 | 1579.6 | 1583.9 |
+| ISO | 0 | 0.125 | 0.125 | 3.9 | 3.9 |
+| ISO | 1 | 0.128 | 0.128 | 1579.6 | 5005.3 |
+
+- Caveat: the layer-1 condition-number MEAN is driven by a single outlier seed (seed 8: PLAIN 11371 → ISO 45640, an already near-singular layer pushed further by isotropic noise); across the other seeds GAUGE/ISO/PLAIN post-patrol conditioning is comparable. No robust general 'GAUGE preserves conditioning better' pattern should be read into the mean row above.
+
+
+## §2 — the parameter-space gate (exploratory bridge, not part of P-G1)
+
+- Driving one unit's incoming scale c: 1.00 → 0.02 while holding the function fixed: incoming norm 0.804 → 0.016, outgoing norm 0.780 → 38.981 (diverges as c→0, exactly the f=0 gate structure one level down — see figure). Not attempted in the primary bounded patrol; demonstrated on request only.
+
+
+## §4.1/§4.2 by-construction vs actually-tested
+
+| result | by-construction? | actually tests |
+|---|---|---|
+| GAUGE patrol leaves f_θ(x) exactly unchanged | **YES** (ReLU positive homogeneity) | implementation correctness only |
+| gauge orbit closes after one period (θ returns exactly) | **YES** (Lissajous s(period)=s(0)=0) | — |
+| GAUGE reaches new-task threshold faster than PLAIN/ISO | no | **P-G1**, the actual claim |
+| mediator shifts (weight-norm balance, conditioning) explain the outcome | no | exploratory, §4.3 |
+
+## Figures
+
+![New-task learning curves (test accuracy vs step), mean over seeds.](results/figures/valley1_curves.png)
+
+*New-task learning curves (test accuracy vs step), mean over seeds.*
+
+![Weight-norm CV and layer condition number, pre/post patrol, by arm.](results/figures/valley1_mediators.png)
+
+*Weight-norm CV and layer condition number, pre/post patrol, by arm.*
+
+![Left: §4.1 invariance audit trace (GAUGE). Right: §2 gate-crossing sweep.](results/figures/valley1_audit_gate.png)
+
+*Left: §4.1 invariance audit trace (GAUGE). Right: §2 gate-crossing sweep.*
+

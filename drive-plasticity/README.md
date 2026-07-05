@@ -61,18 +61,43 @@ frozen trunk, anchored against a random-trunk reservoir `P_rand`. The drive's
 signature prediction is **near-zero erosion**. A `< 0.05` probe window on this
 benchmark makes the metric non-diagnostic (pre-registered fallback to H).
 
+## valley-1 — the gauge-orbit drive (exact-symmetry circulation)
+
+exp7's DRIVE was confined to a finite-HVP top-k curvature subspace that turned
+out vacuous (5 of ~10⁵ params — "confined to flat" was nearly automatic).
+valley-1 replaces that estimated subspace with an EXACT, analytically-known
+one: a ReLU hidden unit's rescaling gauge (incoming weights ×c, outgoing ×1/c,
+c>0) leaves the network function bit-for-bit unchanged (positive homogeneity),
+no estimation, no basis error. `GaugeDrive` patrols a closed Lissajous loop in
+a fixed 2-plane of the combined log-scale space between training episodes;
+the §4.1 audit checks the patrol leaves outputs unchanged to float precision
+(a correctness gate, not a finding). The actual question (§4.2): does WHERE
+you sit on that loss-exact orbit change what the network learns next (steps-
+to-threshold on a fresh permuted-MNIST task), beating PLAIN (no drive) and
+ISO (matched-displacement isotropic noise)?
+
+**Result (10 seeds): K-noteeth.** GAUGE ≈ PLAIN on both learning speed
+(+4.4%, need ≥15%) and final loss, despite GAUGE's directed patrol covering
+~13x more raw parameter distance than ISO's random walk at the same per-step
+displacement budget. The frozen minimum is representationally arbitrary
+(Git Re-Basin) but that arbitrariness has no plasticity cash value here — a
+clean negative, orthogonal to valley-2's (planned) topological/permutation-
+gauge claim about identity rather than plasticity.
+
 ## Run
 
 ```bash
 pip install -r requirements.txt
-pytest -q                                       # HVP, curvature, drive⊥g, probe
+pytest -q                                       # HVP, curvature, drive⊥g, probe, gauge invariance
 python experiments/exp7_plasticity.py           # full grid (writes RESULTS.md)
 python experiments/exp7_plasticity.py --quick   # fast smoke
+python experiments/valley1_gauge_drive.py       # gauge-orbit drive (writes RESULTS.md)
+python experiments/valley1_gauge_drive.py --quick
 ```
 
 MNIST auto-downloads to `data/` on first run. Everything CPU.
 ```
-src/driveplast/  data, model, curvature, drive, baselines, probe
-experiments/     exp7_plasticity, exp7_report
-tests/           HVP correctness, curvature, drive properties, probe
+src/driveplast/  data, model, curvature, drive, baselines, probe, gauge
+experiments/     exp7_plasticity, exp7_report, valley1_gauge_drive, valley1_report
+tests/           HVP correctness, curvature, drive properties, probe, gauge invariance
 ```
