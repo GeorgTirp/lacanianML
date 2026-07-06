@@ -238,6 +238,39 @@ A₂ healing. Two §8.1-documented calibrations: the world's holes were enlarged
 small hole is pinned by its boundary → no EU), and K-charge is gated on the
 per-world-mean ratio (one marginal seed must not veto a working estimator).
 
+## teeth-demo — the position paper's existence-of-mechanism figure
+
+Minimal, general-vocabulary head-to-head for the position paper (§4b): does
+representing the EQUIVALENCE CLASS (here, winding) fix forgetting AND
+overconfidence from ONE mechanism, where sampling the quotient for
+uncertainty alone (an ensemble) fixes only the second? Three models, matched
+data/trunk capacity: **COORD** (GRU point representation), **COORD+ENSEMBLE**
+(M=8 COORD copies, full compute reported honestly), **QUOTIENT** (typed phase
+head + permanent gate barrier). Two axes: AXIS-1 retention under v3/v3b's
+interfering-training protocol (with the probe/erosion/reservoir decomposition
+for honesty); AXIS-2 structured abstention on loops drawn entirely from the
+never-trained interior hole, at matched 90%-on-support acceptance.
+
+**Result: K-noco fired.** QUOTIENT wins AXIS-2 decisively and consistently
+(abstention-score gap ≈ +0.6 over COORD, AUROC 0.95) but AXIS-1 is **bimodal**
+— near-perfect retention in 1/5 seeds, chance-level collapse in the other 4 —
+so it does not clear the pre-registered ≥0.3 margin robustly enough (4/5
+seeds) for the co-movement claim. Traced by hand across every seed: all 5
+show the SAME two-phase mechanism, not independent coin flips. Early in the
+first interfering sub-task (radius — every seed, not sector), min‖f‖ dives
+toward the gate and retention craters to chance within ~100 steps — a genuine
+gate-mediated disruption. By the end of fine-tuning min‖f‖ always recovers to
+a large, healthy value (the barrier prevents a permanent degenerate
+collapse), but WHICH discrete winding class it resettles into is not
+reliably the original one (1/5 seeds heal correctly; the rest stabilize on a
+different, incorrect class). This qualifies rather than contradicts v3's
+conservation law: protection means no silent drift, not that the original
+class survives strong-enough interference. **P-SUBSUME passed cleanly (5/5
+seeds):** the ensemble does not rescue forgetting despite winning on
+calibration — the "Bayesian UQ alone doesn't fix forgetting" half of the
+demonstration holds. See `RESULTS_teeth.md` for the full table, mechanism
+section, and figures.
+
 ## Fairness note
 
 Arms A/B/D receive oracle *angular* supervision during installation — the
@@ -258,7 +291,7 @@ or fully self-supervised installation.
 
 ```
 src/winding/   data, models, losses, topology, uncertainty, train, eval
-experiments/   exp0_sanity, exp1_product_latent, exp2_main
+experiments/   exp0_sanity, exp1_product_latent, exp2_main, ..., teeth_demo
 tests/         topology / data / uncertainty unit tests
 results/       logs (.npz/.csv) and figures/
 ```
@@ -274,6 +307,7 @@ python experiments/exp4_drive.py            # v4: the drive (period test, idling
 python experiments/exp5_dividend.py         # v5: confound gate, dividend, stabilizer
 python experiments/exp6_ring.py             # v6: ring attractor (P13-P17, repair test)
 python experiments/exp9_ampere.py           # v7: the Ampère experiment (charge law, Parts A-D)
+python experiments/teeth_demo.py            # teeth-demo: COORD/ENSEMBLE/QUOTIENT x 2-axis figure
 ```
 
 Determinism: everything is seeded; exp2 runs ≥3 seeds and reports all. Every
