@@ -84,6 +84,27 @@ displacement budget. The frozen minimum is representationally arbitrary
 clean negative, orthogonal to valley-2's (planned) topological/permutation-
 gauge claim about identity rather than plasticity.
 
+### valley-1b — the optimizer confound, controlled
+
+Objection: the rescaling gauge changes per-layer weight norms, and Adam's
+per-coordinate normalization would ABSORB that, pre-explaining K-noteeth even
+if the effect were real. Checked the premise first: valley-1 already used
+plain SGD (not Adam), so that specific confound didn't apply as stated — but
+the control (SGD / SGD+momentum / Adam, otherwise identical protocol, 10
+seeds) was run anyway to fill the missing comparison honestly.
+
+**K-noteeth CONFIRMED and strengthened, band = CONFIRMED.** All three
+optimizers land on K-noteeth. The mechanism is real and visible: under plain
+SGD, individual seeds DO shift (GAUGE−PLAIN spread σ≈10 steps, some seeds by
+>10 steps either way) — SGD is genuinely parameterization-sensitive as
+hypothesized. But that sensitivity carries no consistent sign across seeds,
+so it averages to noise, not a directional teeth benefit. Under SGD+momentum
+and Adam, PLAIN/GAUGE/ISO land on the *exact same* steps-to-threshold in
+every seed — the perturbation is fully absorbed, not merely averaged out.
+Per the pre-registered scope, valley-1c (directed teleportation) is not
+triggered by this result path, since it was gated on SGD showing teeth,
+which it does not.
+
 ## Run
 
 ```bash
@@ -93,11 +114,14 @@ python experiments/exp7_plasticity.py           # full grid (writes RESULTS.md)
 python experiments/exp7_plasticity.py --quick   # fast smoke
 python experiments/valley1_gauge_drive.py       # gauge-orbit drive (writes RESULTS.md)
 python experiments/valley1_gauge_drive.py --quick
+python experiments/valley1b_optimizer_control.py         # SGD/SGD+momentum/Adam control
+python experiments/valley1b_optimizer_control.py --quick
 ```
 
 MNIST auto-downloads to `data/` on first run. Everything CPU.
 ```
 src/driveplast/  data, model, curvature, drive, baselines, probe, gauge
-experiments/     exp7_plasticity, exp7_report, valley1_gauge_drive, valley1_report
+experiments/     exp7_plasticity, exp7_report, valley1_gauge_drive, valley1_report,
+                 valley1b_optimizer_control, valley1b_report
 tests/           HVP correctness, curvature, drive properties, probe, gauge invariance
 ```

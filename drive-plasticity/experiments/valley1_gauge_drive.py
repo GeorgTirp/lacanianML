@@ -31,7 +31,23 @@ from driveplast.gauge import GaugeDrive, relu_layers, gauge_mediators, gate_cros
 
 ARMS = ["PLAIN", "GAUGE", "ISO"]
 HP = dict(width=64, depth=2, lr=0.3, bs=128, epochs0=3, K_idle=200, amp=0.3,
-          epochs1=8, eval_every=4, threshold=0.80, n_tasks=2, n_train=2000, n_test=2000)
+          epochs1=8, eval_every=4, threshold=0.80, n_tasks=2, n_train=2000, n_test=2000,
+          # valley-1b: per-layer-norm-sensitive vs -invariant optimizers (additive; "lr"
+          # above remains the plain-SGD rate valley-1 always used). lr_momentum/lr_adam
+          # are calibrated so each optimizer actually reaches a comparable task-0 minimum
+          # (see valley1b_optimizer_control.py's pilot check) -- an engineering choice,
+          # not a locked scientific quantity.
+          lr_momentum=0.05, lr_adam=1e-3)
+
+
+def make_optimizer(opt_name, params, cfg):
+    if opt_name == "sgd":
+        return torch.optim.SGD(params, lr=cfg["lr"])
+    if opt_name == "sgd_momentum":
+        return torch.optim.SGD(params, lr=cfg["lr_momentum"], momentum=0.9)
+    if opt_name == "adam":
+        return torch.optim.Adam(params, lr=cfg["lr_adam"])
+    raise ValueError(f"unknown optimizer {opt_name!r}")
 
 
 def _gauge_period(cfg):
@@ -57,9 +73,9 @@ def _probe_out(model, x):
         return model(x).clone()
 
 
-def train_to_minimum(model, xtr, ytr, cfg, seed):
+def train_to_minimum(model, xtr, ytr, cfg, seed, opt_name="sgd"):
     torch.manual_seed(seed)
-    opt = torch.optim.SGD(model.parameters(), lr=cfg["lr"])
+    opt = make_optimizer(opt_name, model.parameters(), cfg)
     lossf = nn.CrossEntropyLoss()
     N = len(xtr)
     for _ in range(cfg["epochs0"]):
@@ -70,9 +86,9 @@ def train_to_minimum(model, xtr, ytr, cfg, seed):
             opt.zero_grad(); loss.backward(); opt.step()
 
 
-def train_new_task(model, xtr, ytr, xte, yte, cfg, seed):
+def train_new_task(model, xtr, ytr, xte, yte, cfg, seed, opt_name="sgd"):
     torch.manual_seed(seed)
-    opt = torch.optim.SGD(model.parameters(), lr=cfg["lr"])
+    opt = make_optimizer(opt_name, model.parameters(), cfg)
     lossf = nn.CrossEntropyLoss()
     N = len(xtr)
     budget = cfg["epochs1"] * ((N + cfg["bs"] - 1) // cfg["bs"])
@@ -106,7 +122,7 @@ def first_grad_norm(model, xtr, ytr, cfg):
     return float(torch.cat([x.reshape(-1) for x in g]).norm())
 
 
-def run_seed(seed, cfg):
+def run_seed(seed, cfg, opt_name="sgd"):
     torch.manual_seed(seed); np.random.seed(seed)   # fix BEFORE any param init (reproducibility)
     stream = PermutedMNIST(cfg["n_tasks"], n_train=cfg["n_train"], n_test=cfg["n_test"], seed=seed)
     x0tr, y0tr, x0te, y0te = stream.task(0)
@@ -114,7 +130,7 @@ def run_seed(seed, cfg):
     lossf = nn.CrossEntropyLoss()
 
     base = MLP(width=cfg["width"], depth=cfg["depth"])
-    train_to_minimum(base, x0tr, y0tr, cfg, seed)
+    train_to_minimum(base, x0tr, y0tr, cfg, seed, opt_name)
     acc0, _ = _eval(base, x0te, y0te, lossf)                # sanity: task0 actually learned
 
     dims = [l.out_features for l in relu_layers(base)[0]]
@@ -157,7 +173,7 @@ def run_seed(seed, cfg):
         acc_old_post, loss_old_post = _eval(m, x0te, y0te, lossf)  # old-task retention after patrol
         med_post = gauge_mediators(m)
         fgn = first_grad_norm(m, x1tr, y1tr, cfg)
-        curve = train_new_task(m, x1tr, y1tr, x1te, y1te, cfg, seed)
+        curve = train_new_task(m, x1tr, y1tr, x1te, y1te, cfg, seed, opt_name)
         stt = steps_to_threshold(curve, cfg["threshold"])
         out[arm] = dict(arm=arm, audit_max=audit_max, acc_old_pre=acc0, acc_old_post=acc_old_post,
                         loss_old_post=loss_old_post, med_pre=med_pre, med_post=med_post,

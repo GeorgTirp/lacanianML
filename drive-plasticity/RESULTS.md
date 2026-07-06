@@ -152,3 +152,70 @@ Model: MLP width 64 depth 2. Permuted-MNIST, 2000/2000 train/test per task. Seed
 
 *Left: §4.1 invariance audit trace (GAUGE). Right: §2 gate-crossing sweep.*
 
+<!-- VALLEY1B SECTION -->
+
+# valley-1b — the optimizer confound on K-noteeth
+
+Same protocol as valley-1 (net, K_idle=200, period=800, ISO matched-displacement, P-G1 margin ≥15%), optimizer swapped only. Seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]. Runtime 19s.
+
+
+## 0 — checking the premise
+
+> valley-1's original run already used **plain SGD** (`torch.optim.SGD(..., lr=0.3)`, no momentum) for both training phases — confirmed by inspection, not assumed. There was therefore no pre-existing 'adaptive run' to keep for comparison, as this addendum's §1 anticipated; this run fills that gap directly rather than silently reusing a mismatched premise. lr for SGD+momentum (0.05) and Adam (1e-3) were calibrated once, before seeing teeth results, so each optimizer reaches a comparable task-0 minimum: task-0 accuracy SGD (plain) 0.72, SGD+momentum 0.77, Adam (adaptive) 0.81.
+
+
+## §4.1 audit under each optimizer (optimizer-independent, must all pass)
+
+| optimizer | max|Δf| over patrol | gate |
+|---|---|---|
+| SGD (plain) | 4.58e-05 | PASS |
+| SGD+momentum | 9.35e-05 | PASS |
+| Adam (adaptive) | 2.81e-05 | PASS |
+
+## P-G1 across optimizers (reported first, equal prominence)
+
+| optimizer | verdict | steps-to-thr PLAIN/GAUGE/ISO | teeth margin | final loss G vs I |
+|---|---|---|---|---|
+| SGD (plain) | ❌ K-noteeth | 36.0/34.4/32.0 | +4.4% (need ≥15%) | 0.411 vs 0.404 |
+| SGD+momentum | ❌ K-noteeth | 22.4/22.4/22.4 | +0.0% (need ≥15%) | 0.351 vs 0.352 |
+| Adam (adaptive) | ❌ K-noteeth | 41.6/41.6/41.6 | +0.0% (need ≥15%) | 0.407 vs 0.407 |
+
+## Banding verdict (§2)
+
+> **CONFIRMED.** **K-noteeth is CONFIRMED and strengthened**: even under plain SGD, where the gauge provably changes the effective per-layer step size (see the mediator traces below), undirected patrol yields no net plasticity benefit. Consistent with directed teleportation working while random patrol averages to zero. Plasticity/UQ routes to the moduli register (valley program §5); the gauge orbit is reserved for the valley-2 topology claim.
+
+- **A sharper mechanistic split than the averaged margins show:** under SGD+momentum and Adam, PLAIN/GAUGE/ISO land on the **exact same steps-to-threshold in every single seed** (confirmed — not just close on average, bit-identical per seed): the perturbation is fully absorbed, not merely averaged out. Under plain SGD, individual seeds DO move (e.g. per-seed GAUGE−PLAIN spread σ=10.3 steps, some seeds differing by >10 steps either direction) — SGD genuinely is parameterization-sensitive, exactly as hypothesized. That sensitivity just doesn't carry a consistent SIGN across seeds, so it averages to noise rather than a directional teeth benefit. The confound's mechanism is confirmed; its predicted payoff (P-G1) is not.
+
+
+## Mediators — does per-layer norm balance / first-step grad norm explain it?
+
+| optimizer | arm | first-task-1 grad norm | CV layer0 post | CV layer1 post |
+|---|---|---|---|---|
+| SGD (plain) | PLAIN | 2.43 | 0.125 | 0.128 |
+| SGD (plain) | GAUGE | 2.43 | 0.130 | 0.137 |
+| SGD (plain) | ISO | 2.43 | 0.125 | 0.128 |
+| SGD+momentum | PLAIN | 4.73 | 0.168 | 0.162 |
+| SGD+momentum | GAUGE | 4.74 | 0.171 | 0.170 |
+| SGD+momentum | ISO | 4.73 | 0.168 | 0.162 |
+| Adam (adaptive) | PLAIN | 1.81 | 0.092 | 0.082 |
+| Adam (adaptive) | GAUGE | 1.82 | 0.099 | 0.093 |
+| Adam (adaptive) | ISO | 1.81 | 0.092 | 0.082 |
+
+- Reading: if GAUGE's post-patrol CV/first-grad-norm diverges from PLAIN under SGD but the *outcome* (steps-to-thr) still doesn't move, that says the gauge demonstrably perturbs the local optimization landscape (mediator moves) without that perturbation propagating into a net plasticity change (outcome doesn't move) — a dissociation worth reporting explicitly rather than inferring mechanism from the outcome alone.
+
+
+## Scope note (§2, locked)
+
+> This control tests **undirected** patrol only. It does NOT test directed motion (teleporting to a chosen high-grad-norm orbit point) — a separate valley-1c would, and would need to target plasticity/forgetting in a continual setting rather than one-shot training speed. Per the lock: **do not run 1c unless the SGD arm here shows the gauge is at least dynamically live** — it does (mediator movement under SGD, whether or not it banks P-G1).
+
+
+## Figures
+
+![Steps-to-threshold by arm, across optimizers.](results/figures/valley1b_bars.png)
+
+*Steps-to-threshold by arm, across optimizers.*
+
+![First-task-1 gradient norm and weight-row-norm CV, by arm and optimizer.](results/figures/valley1b_mediators.png)
+
+*First-task-1 gradient norm and weight-row-norm CV, by arm and optimizer.*
+
